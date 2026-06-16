@@ -2,7 +2,7 @@ import express from "express";
 import cors from "cors";
 import mongoose from "mongoose";
 import connectDB from "./config/db.js";
-import { allowedOrigins, env } from "./config/env.js";
+import { env } from "./config/env.js";
 import { uploadsRoot } from "./config/paths.js";
 import adminRoutes from "./routes/adminRoutes.js";
 import analyticsRoutes from "./routes/analyticsRoutes.js";
@@ -18,10 +18,20 @@ console.log(`MONGO_URI loaded: ${process.env.MONGO_URI ? "yes" : "no"}`);
 
 await connectDB();
 
+const allowedOrigins = [
+  process.env.FRONTEND_URL,
+  "http://localhost:5173",
+  "https://portfolio-eight-liart-66.vercel.app",
+].filter(Boolean);
+
 app.use(
   cors({
     origin: (origin, callback) => {
-      if (!origin || allowedOrigins.includes(origin)) {
+      if (
+        !origin ||
+        allowedOrigins.includes(origin) ||
+        origin.endsWith(".vercel.app")
+      ) {
         callback(null, true);
         return;
       }
